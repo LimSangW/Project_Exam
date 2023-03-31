@@ -14,6 +14,9 @@ namespace Project.UIFramework
         private Canvas mainCanvas;
         private GraphicRaycaster graphicRaycaster;
 
+        public PanelUILayer PanelLayer => panelLayer;
+        public WindowUILayer WindowLayer => windowLayer;
+        
         public Canvas MainCanvas
         {
             get

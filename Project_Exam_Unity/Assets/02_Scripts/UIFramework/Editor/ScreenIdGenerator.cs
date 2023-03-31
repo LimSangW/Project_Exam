@@ -10,7 +10,7 @@ namespace Project.UIFramework.Editor
 {
     public class ScreenIdProcessor : AssetPostprocessor
     {
-        private const string UIPrefabFolder = "Assets/03_Prefabs/UIScreens";
+        private const string UIPrefabFolder = "Assets/03_Prefabs/UIFramework/UIScreens";
         private const string UIIdScriptFolder = "Assets/02_Scripts/UIFramework";
         private const string ScreenIdScriptName = "ScreenIds";
         private const string ScreenIdScriptNamespace = "Project.UIFramework";

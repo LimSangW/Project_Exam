@@ -54,6 +54,7 @@ public class MainPlayWindowController : AWindowController
 
     private void DoInTransitionFinished(IUIScreenController screen)
     {
+        
     }
 
     public void OnUpdateProductBoxes()
