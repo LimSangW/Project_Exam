@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
-public class GameStartManager : UpdateableManager<GameStartManager> // 게임 시작 플로우 관리 Manager
+public class GameStartManager : UpdateableManager<GameStartManager>
 {
     private Dictionary<GameStartState.GameStartStateType, GameStartState> statesDic;
     private List<GameStartState.GameStartStateType> actionTypeList;
@@ -13,9 +14,10 @@ public class GameStartManager : UpdateableManager<GameStartManager> // 게임 시작
     {
         Init();
         statesDic = new Dictionary<GameStartState.GameStartStateType, GameStartState>();
+        
         statesDic.Add(GameStartState.GameStartStateType.Init, new GameStartState_Init(this));
         statesDic.Add(GameStartState.GameStartStateType.InitManager, new GameStartState_InitManager(this));
-
+        
         actionTypeList = new List<GameStartState.GameStartStateType>();
     }
 
@@ -42,11 +44,9 @@ public class GameStartManager : UpdateableManager<GameStartManager> // 게임 시작
         if (actionTypeList.Count <= 0)
             return;
 
-        //Add 된 순서대로 ChangeState
         var nextType = actionTypeList[0];
         if (statesDic.ContainsKey(nextType) == true)
         {
-            //ChangeState후에는 필요없고 다음 것 탐색을 위해 Remove
             actionTypeList.Remove(nextType);
             ChangeState(nextType);
         }
@@ -60,6 +60,7 @@ public class GameStartManager : UpdateableManager<GameStartManager> // 게임 시작
     public override void ClearData()
     {
         isInitialized = false;
+        statesDic.Clear();
         actionTypeList.Clear();
         currentState = null;
     }

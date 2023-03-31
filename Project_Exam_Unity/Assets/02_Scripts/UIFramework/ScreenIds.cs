@@ -12,5 +12,7 @@ namespace Project.UIFramework {
     
     
     public sealed class ScreenIds {
+        
+        public const string MainPlayWindow = "MainPlayWindow";
     }
 }

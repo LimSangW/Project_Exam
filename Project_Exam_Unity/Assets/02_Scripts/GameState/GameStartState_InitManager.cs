@@ -7,6 +7,12 @@ public class GameStartState_InitManager : GameStartState
 {
     public GameStartState_InitManager(GameStartManager manager) : base(manager)
     {
+
+    }
+
+    public override void OnEnter()
+    {
+        UIManager.Instance.Init();
         DataManager.Instance.Init();
         StageManager.Instance.Init();
 
