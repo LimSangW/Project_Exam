@@ -33,7 +33,7 @@ public class UIManager : ManagerWithMono<UIManager>
 
         Signals.Get<NavigateToWindowSignal>().AddListener(OnNavigateToWindow);
         Signals.Get<TogglePanelSignal>().AddListener(OnTogglePanel);
-
+        
         IsInitialized = true;
     }
 
@@ -67,6 +67,9 @@ public class UIManager : ManagerWithMono<UIManager>
 
             uiFrame.CloseCurrentWindow();
         }
+
+        if (!string.IsNullOrEmpty(windowId))
+            uiFrame.OpenWindow(windowId);
     }
     
     private void OnTogglePanel(string panelId, bool isOn, IPanelProperties props = null)
