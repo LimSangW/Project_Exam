@@ -5,6 +5,7 @@ using Project.UIFramework;
 using Project.Utils;
 
 public class NavigateToWindowSignal : ASignal<string, WindowProperties> { }
+public class TogglePanelSignal : ASignal<string, bool, IPanelProperties> { }
 
 public class UIManager : ManagerWithMono<UIManager>
 {
@@ -31,6 +32,7 @@ public class UIManager : ManagerWithMono<UIManager>
         MainUICanvas.planeDistance = 1.0F;
 
         Signals.Get<NavigateToWindowSignal>().AddListener(OnNavigateToWindow);
+        Signals.Get<TogglePanelSignal>().AddListener(OnTogglePanel);
 
         IsInitialized = true;
     }
@@ -39,6 +41,9 @@ public class UIManager : ManagerWithMono<UIManager>
     {
         uiFrame = null;
         canvasGroup = null;
+        
+        Signals.Get<NavigateToWindowSignal>().RemoveListener(OnNavigateToWindow);
+        Signals.Get<TogglePanelSignal>().RemoveListener(OnTogglePanel);
     }
     
     private void OnNavigateToWindow(string windowId, IWindowProperties props = null)
@@ -61,6 +66,31 @@ public class UIManager : ManagerWithMono<UIManager>
             }
 
             uiFrame.CloseCurrentWindow();
+        }
+    }
+    
+    private void OnTogglePanel(string panelId, bool isOn, IPanelProperties props = null)
+    {
+        if (!string.IsNullOrEmpty(panelId) && isOn == uiFrame.IsPanelOpen(panelId))
+        {
+            Debug.Log($"This panel({panelId}) is already on the toggle state({isOn})!");
+            return;
+        }
+
+        if (isOn)
+        {
+            if (props != null)
+            {
+                uiFrame.ShowPanel(panelId, props);
+            }
+            else
+            {
+                uiFrame.ShowPanel(panelId);
+            }
+        }
+        else
+        {
+            uiFrame.HidePanel(panelId);
         }
     }
 }
