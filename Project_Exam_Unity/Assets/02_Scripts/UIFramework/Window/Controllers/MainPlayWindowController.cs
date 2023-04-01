@@ -3,14 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Project.UIFramework;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.CullingGroup;
 
 public class MainPlayWindowController : AWindowController
 {
     [SerializeField] private RectTransform gridLayout;
+    [SerializeField] private Slider timeProgress;
+    [SerializeField] private TextMeshProUGUI scoreText;
+
+    private Timer gameTimer;
     private List<Button> buttons;
+    
     protected override void Awake()
     {
         base.Awake();
@@ -44,6 +49,22 @@ public class MainPlayWindowController : AWindowController
 
     protected override void OnPropertiesSet()
     {
+        gameTimer = TimerManager.Instance.GetTimer("GameTimer");
+        scoreText.SetText($"점수 : 0");
+        timeProgress.value = timeProgress.maxValue;
+        
+        if(gameTimer == null) return;
+        
+        gameTimer.updateCallback += (x) =>
+        {
+            float temp = (float)x / (float)gameTimer.MaxTime;
+            timeProgress.value = timeProgress.maxValue * temp;
+        };
+
+        InGameManager.Instance.OnScored += (score) =>
+        {
+            scoreText.SetText($"점수 : {score}");
+        };
     }
 
     protected override void WhileHiding()
@@ -52,6 +73,5 @@ public class MainPlayWindowController : AWindowController
 
     private void DoInTransitionFinished(IUIScreenController screen)
     {
-        
     }
 }

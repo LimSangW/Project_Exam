@@ -5,28 +5,28 @@ using UnityEngine;
 
 public class Timer
 {
-    public string KeyName => _keyName;
     protected string _keyName;
     protected double _time;
-    protected Action _callback;
+    protected Action timeoverCallback;
     protected bool _isTimeOver = false;
 
+    public double MaxTime { get; private set; }
     public bool _isStart = false;
-
     public bool IsTimeOver => _isTimeOver;
-
+    public string KeyName => _keyName;
     public double Time => _time;
+    public Action<double> updateCallback;
 
     public Timer(string keyName, double time, Action timeoverCallback)
     {
         _isTimeOver = false;
         _keyName = keyName;
         _time = time;
-        _callback = timeoverCallback;
+        MaxTime = time;
+        this.timeoverCallback = timeoverCallback;
         TimerManager.Instance.AddTimer(this);
     }
 
-    // �ð��� �ٽ� ���� �Լ� �����.
     public virtual void OnUpdate()
     {
         if (_isTimeOver == true)
@@ -35,11 +35,12 @@ public class Timer
         if(_isStart)
         {
             _time -= UnityEngine.Time.unscaledDeltaTime;
+            updateCallback?.Invoke(_time);
+            
             if (_time <= 0)
             {
                 _isTimeOver = true;
-
-                _callback?.Invoke();
+                timeoverCallback?.Invoke();
             }
         }
 
@@ -60,7 +61,8 @@ public class Counter : Timer
 {
     double _limitTime;
 
-    public Counter(string keyName, double time, double limitTime, Action timeoverCallback) : base(keyName, time, timeoverCallback)
+    public Counter(string keyName, double time, double limitTime, Action timeoverCallback) 
+        : base(keyName, time, timeoverCallback)
     {
         _limitTime = limitTime;
     }
@@ -73,7 +75,7 @@ public class Counter : Timer
             if (_time >= _limitTime)
             {
                 _isTimeOver = true;
-                _callback?.Invoke();
+                timeoverCallback?.Invoke();
             }
         }
     }
@@ -82,12 +84,10 @@ public class Counter : Timer
 public class FriendTimer : Timer 
 {
     public bool refreshFriend = false;
-    private double _maxTime;
     private float recoveryTime = 0;
 
     public FriendTimer(string keyName, double time, Action timeoverCallback, float _recoveryTime) : base(keyName, time, timeoverCallback)
     {
-        _maxTime = _time;
         recoveryTime = _recoveryTime;
     }
 
@@ -103,7 +103,7 @@ public class FriendTimer : Timer
                 _time += UnityEngine.Time.unscaledDeltaTime;
 
                 //InGameManager.Instance.FriendRecovery(KeyName, recoveryTime);
-                if (_time >= _maxTime)
+                if (_time >= MaxTime)
                 {
                     refreshFriend = false;
                     _isStart = false;
@@ -117,7 +117,7 @@ public class FriendTimer : Timer
                     _isTimeOver = true;
                     //TimerManager.Instance.RemoveTimer(this);
 
-                    _callback?.Invoke();
+                    timeoverCallback?.Invoke();
                 }
             }
         }
@@ -127,7 +127,7 @@ public class FriendTimer : Timer
 
 public class TimerManager : SingletonWithMono<TimerManager>
 {
-    Dictionary<string, Timer> _timers;
+    private Dictionary<string, Timer> _timers;
 
     public void Awake()
     {
@@ -164,56 +164,10 @@ public class TimerManager : SingletonWithMono<TimerManager>
         }
     }
 
-    public static Tuple<int, Tuple<string, string>[]> RemainTime(double time, 
-        int lessThan_1Minute_Index = 56, 
-        int lessThan_60Minute_Index = 55,
-        int lessThan_24Hour_Index = 54,
-        int excess_24Hour_Index = 53)
+    public Timer GetTimer(string key)
     {
-        int stringIndex = -1;
-        Tuple<string, string>[] parameter = null;
-
-        if (time < 60)
-        {
-            stringIndex = lessThan_1Minute_Index;
-            parameter = Utilities.GetTupleArray<string, string>(new[] { ("-1", "-1") });
-            //1�й̸�
-            //returnValue = "1�й̸�";
-        }
-        else if(time < 3600)
-        {
-            //1�� �̻� 60�� �̸�.
-            //returnValue = ((int)time / 60).ToString();
-            int minuteValue = (int)time / 60;
-            int secondValue = (int)time % 60;
-            stringIndex = lessThan_60Minute_Index;
-            parameter = Utilities.GetTupleArray<string, string>(new[] 
-            {
-                ("0", minuteValue.ToString()), 
-                ("1", secondValue.ToString()) 
-            });
-        }
-        else if(time < 86400)
-        {
-            int timeValue = (int)time / 3600;
-            int minuteValue = ((int)time - timeValue * 3600) / 60;
-            stringIndex = lessThan_24Hour_Index;
-            parameter = Utilities.GetTupleArray<string, string>(new[] 
-            {
-                ("0", timeValue.ToString()),
-                ("1", minuteValue.ToString())
-            });
-        }
-        else
-        {
-            int dayValue = (int)time / 86400;
-            stringIndex = excess_24Hour_Index;
-            parameter = Utilities.GetTupleArray<string, string>(new[] 
-            {
-                ("0", dayValue.ToString()),
-            });
-        }
-
-        return new Tuple<int, Tuple<string, string>[]>(stringIndex, parameter);
+        if (_timers.ContainsKey(key))
+            return _timers[key];
+        return null;
     }
 }

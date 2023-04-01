@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,8 @@ public class InGameManager : ManagerWithMono<InGameManager>
 
     public int Score => score;
 
-
+    public Action<int> OnScored;
+    
     public override void Init()
     {
         base.Init();    
