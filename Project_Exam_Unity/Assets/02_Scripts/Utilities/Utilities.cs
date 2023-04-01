@@ -138,6 +138,17 @@ public static class Utilities
         trans.localScale = Vector3.one;
     }
     
+    public static Tuple<T1, T2>[] GetTupleArray<T1, T2>((T1, T2)[] arr)
+    {
+	    Tuple<T1, T2>[] tuples = new Tuple<T1, T2>[arr.Length];
+
+	    for (int i = 0; i < arr.Length; ++i)
+	    {
+		    tuples[i] = new Tuple<T1, T2>(arr[i].Item1, arr[i].Item2);
+	    }
+
+	    return tuples;
+    }
 
     public static Color GetColorByHex(string hexCode)
     {
