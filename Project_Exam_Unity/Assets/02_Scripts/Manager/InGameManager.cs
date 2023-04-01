@@ -1,92 +1,93 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
-using static Friend;
 
-public struct StrFriend
+public class FriendRoundInfo
 {
-    public int time;
-    public int randomRushNum;
-    public int randomRushDecreaseHP;
-    //占쏙옙占쏙옙占쏙옙트占쏙옙 占쏙옙占쏙옙占심띰옙? 占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙占쏙옙占쏙옙? 占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙占쏙옙占쏙옙? min占쏙옙 max占쏙옙 random占쏙옙 占싱억옙 占쏙옙 friend 占쏙옙占쏙옙 占쏙옙 占쏙옙占쏙옙.
-    public float minDecreaseSpeed;
-    public float maxDecreaseSpeed;
+    public float FriendHp;
+    public float DontSee;
+    public float FriendRecoveryDuration;
+
+    public FriendRoundInfo(TRFriend friend)
+    {
+        FriendHp = friend.FriendHp;
+        DontSee = friend.DontSee;
+        FriendRecoveryDuration = friend.FriendRecoveryDuration;
+    }
 }
-public class InGameManager : Manager<InGameManager>
+
+public class InGameManager : ManagerWithMono<InGameManager>
 {
     static public string Friend_ = "Friend_";
 
-    public int ready; // 占쏙옙占쏙옙 to 占쏙옙占쏙옙 占쏙옙占시곤옙.
+    public int ready;
 
-    public int round=0;
+    public int round = 0;
     public int time;
     public int score;
 
     public int maxRound;
     public int maxScore;
 
-    private Dictionary<int, StrFriend> friendXmlMap;
-    private Dictionary<int, Friend> friendsObjMap;
-    private StrFriend currentRoundData;
+    private Dictionary<int, Friend> friendsDic;
+    private Dictionary<int, FriendRoundInfo> friendRoundInfoDic = new Dictionary<int, FriendRoundInfo>();
     private float decreaseSpeed;
 
     private Friend currentFriend;
 
-    public Timer gameTimer;
+    [SerializeField] private Transform friendGroup;
+    public Player MainPlayer;
+    public Timer GameTimer;
+
 
     public override void Init()
     {
         base.Init();    
         GameManager.Instance.RegisterManager(this);
 
-
-        friendXmlMap = new Dictionary<int, StrFriend>();
-
-
         FriendInit();
-
-        RoundInitData(round);
+        InitData();
         FriendDataResettings();
     }
 
     public override void ClearData()
     {
+        friendRoundInfoDic.Clear();
     }
     
     public void PreparationTime()
     {
         int temptime = 3;
-        if(gameTimer == null)
+        if(GameTimer == null)
         {
-            gameTimer = new Timer("InGameManagerTimer", temptime, StartRound);
+            GameTimer = new Timer("InGameManagerTimer", temptime, StartRound);
         }
         else
         {
-            gameTimer.RefreshTime(temptime);
+            GameTimer.RefreshTime(temptime);
         }
-        gameTimer._isStart = true;
+        GameTimer._isStart = true;
     }
 
     public void FriendInit()
     {
-        friendsObjMap = new Dictionary<int, Friend>();
-        Friend[] tFriendObjs = UnityEngine.Object.FindObjectsOfType<Friend>();
-        int key = 0;
-        string temp;
-        foreach (Friend tFriendObj in tFriendObjs)
-        {
-            key = tFriendObj.currentLocationPoint;
-            temp = Friend_ + key;
-            tFriendObj.friendTimer = new FriendTimer(temp, currentRoundData.time, GameOver_FriendTime, 0f);
+        friendsDic = new Dictionary<int, Friend>();
+        Friend[] friends = friendGroup.GetComponentsInChildren<Friend>();
 
-            friendsObjMap.Add(key, tFriendObj);
+        for (int i = 0; i < friends.Length; i++)
+        {
+            Friend thisFriend = friends[i];
+            int thisFriendLocation = thisFriend.currentLocationPoint;
+            
+            friendsDic.Add(thisFriendLocation, friends[i]);
+            //thisFriend.friendTimer = new FriendTimer(Friend_ + thisFriendLocation, currentRoundData.time, GameOver_FriendTime, 0f);
         }
     }
+    
     public void GameOver_FriendTime()
     {
-        // 친占쏙옙 占쏙옙占쌕곤옙 타占쏙옙 占쏙옙占쏙옙 占싣댐옙.
+        // ģ�� ���ٰ� Ÿ�� ���� �ƴ�.
         GameOver();
     }
     public void GameOver_TeacherMeet()
@@ -101,120 +102,40 @@ public class InGameManager : Manager<InGameManager>
     {
 
     }
-    public void RoundInitData(int tRound)
+    
+    private void InitData()
     {
-        // 占쏙옙占썲가 占쏙옙占쏙옙 占쏙옙 占쏙옙占쏙옙占쏙옙 xml 占쏙옙占쏙옙占싶울옙占쏙옙 占쏙옙占쏙옙占쏙옙占쌍깍옙.
-        StrFriend tValue;
-        if (friendXmlMap.TryGetValue(tRound, out tValue))
-        {
-            currentRoundData = tValue;
-        }
+        List<TRFriend> friendData = DataManager.Instance.GetRecords<TRFriend>(TableType.Friend);
+
+        for (int i = 0; i < friendData.Count; i++)
+            friendRoundInfoDic.Add((int)friendData[i].PlayTime, new FriendRoundInfo(friendData[i]));
     }
+
+    public Friend GetCurrentFriend(int num)
+    {
+        currentFriend = friendsDic[num];
+        return currentFriend;
+    }
+    
     public void FriendDataResettings()
     {
-        int tempj = 0;
-        for (int i = 0; i < friendsObjMap.Count; i++)
-        {
-            tempj = i+1;
-            if(tempj == 5)
-            {
-                tempj = 9; 
-            }
 
-            friendsObjMap[tempj].DecreaseSpeed = Random.Range(currentRoundData.minDecreaseSpeed, currentRoundData.maxDecreaseSpeed);
-
-            friendsObjMap[tempj].friendTimer.RefreshTime(currentRoundData.time);
-            friendsObjMap[tempj].friendTimer._isStart = false;
-            friendsObjMap[tempj].friendTimer.refreshFriend = false;
-        }
     }
-    public void StartRound()    // 占쏙옙占쏙옙占쏙옙占쏙옙 3,2,1 카占쏙옙트 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙占싹곤옙占쏙옙占쏙옙.
+    
+    public void StartRound()
     {
-        gameTimer._isStart = false;
+        GameTimer._isStart = false;
 
         int tempj = 0;
-        for (int i = 0; i < friendsObjMap.Count; i++)
+        for (int i = 0; i < friendsDic.Count; i++)
         {
             tempj = i + 1;
             if (tempj == 5)
             {
                 tempj = 9;
             }
-            friendsObjMap[tempj].friendTimer._isStart = true;
-            friendsObjMap[tempj].friendTimer.refreshFriend = true;
+            friendsDic[tempj].friendTimer._isStart = true;
+            friendsDic[tempj].friendTimer.refreshFriend = true;
         }
-    }
-
-    public void NextRound()
-    {
-        round++;
-        RoundInitData(round);
-        FriendDataResettings();
-
-        PreparationTime();
-    }
-
-    public void TargetAngryStart(int tTarget)
-    {
-        if (tTarget == 5)
-        {
-            currentFriend = null;
-            return;
-        }
-        if(currentFriend != null)
-        {
-            currentFriend.friendTimer.refreshFriend = true;
-        }
-
-        Friend targetObj = friendsObjMap[tTarget];
-        EFriendState targetState = targetObj.FriendState;
-
-        switch (targetState) 
-        {
-            case EFriendState.Normal:
-            targetObj.FriendState = EFriendState.LookatMe;
-            break;
-
-            case EFriendState.Over:
-            if(targetObj.currentLocationPoint == PlayerManager.Instance.CurrentDirView)
-            {
-                GameOver_FriendTime();
-                return;
-            }
-            break;
-            default:
-            break;
-        }
-
-        currentFriend = targetObj;
-        currentFriend.friendTimer.refreshFriend = false;
-    }
-
-
-    public void FriendRecovery(string keyName, float tRecoveryTime)
-    {
-        keyName = Regex.Replace(keyName, @"\D", "");
-        int nTmp = int.Parse(keyName);
-
-        int tRecoveryHP = Mathf.RoundToInt((100 - friendsObjMap[nTmp].CurrentHP) / tRecoveryTime);
-
-        friendsObjMap[nTmp].CurrentHP += tRecoveryHP;
-        if (friendsObjMap[nTmp].CurrentHP >= 100)
-        {
-            friendsObjMap[nTmp].CurrentHP = 100;
-        }
-    }
-    public void FriendDamage(string keyName)
-    {
-        keyName = Regex.Replace(keyName, @"\D", "");
-        int nTmp = int.Parse(keyName);
-
-        friendsObjMap[nTmp].CurrentHP--;
-
-        if (friendsObjMap[nTmp].CurrentHP <= 0)
-        {
-            InGameManager.instance.GameOver_FriendTime();
-        }
-
     }
 }
