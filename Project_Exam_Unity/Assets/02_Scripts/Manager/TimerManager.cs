@@ -11,6 +11,8 @@ public class Timer
     protected Action _callback;
     protected bool _isTimeOver = false;
 
+    public bool _isStart = false;
+
     public bool IsTimeOver => _isTimeOver;
 
     public double Time => _time;
@@ -24,19 +26,23 @@ public class Timer
         TimerManager.Instance.AddTimer(this);
     }
 
+    // 시간이 다시 차는 함수 만들기.
     public virtual void OnUpdate()
     {
         if (_isTimeOver == true)
             return;
 
-        _time -= UnityEngine.Time.unscaledDeltaTime;
-        if (_time <= 0)
+        if(_isStart)
         {
-            _isTimeOver = true;
-            TimerManager.Instance.RemoveTimer(this);
+            _time -= UnityEngine.Time.unscaledDeltaTime;
+            if (_time <= 0)
+            {
+                _isTimeOver = true;
 
-            _callback?.Invoke();
+                _callback?.Invoke();
+            }
         }
+
     }
 
     public virtual void RefreshTime(double time)
@@ -68,6 +74,50 @@ public class Counter : Timer
             {
                 _isTimeOver = true;
                 _callback?.Invoke();
+            }
+        }
+    }
+}
+
+public class FriendTimer : Timer 
+{
+    public bool refreshFriend = false;
+    private double _maxTime;
+    private float recoveryTime = 0;
+
+    public FriendTimer(string keyName, double time, Action timeoverCallback, float recoveryTime) : base(keyName, time, timeoverCallback)
+    {
+        _maxTime = _time;
+        recoveryTime = recoveryTime;
+    }
+
+    public override void OnUpdate()
+    {
+        if (_isTimeOver == true)
+            return;
+
+        if(_isStart)
+        {
+            if (refreshFriend)
+            {
+                _time += UnityEngine.Time.unscaledDeltaTime;
+
+                if (_time >= _maxTime)
+                {
+                    refreshFriend = false;
+                    _isStart = false;
+                }
+            }
+            else
+            {
+                _time -= UnityEngine.Time.unscaledDeltaTime;
+                if (_time <= 0)
+                {
+                    _isTimeOver = true;
+                    //TimerManager.Instance.RemoveTimer(this);
+
+                    _callback?.Invoke();
+                }
             }
         }
     }
