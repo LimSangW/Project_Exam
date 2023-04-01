@@ -27,7 +27,6 @@ public class MainPlayWindowController : AWindowController
         
         void OnClickButton(int tValue) 
         {
-            Debug.Log("ASD");
             InGameManager.Instance.MainPlayer.PlayerAction(tValue);
         }
     }
@@ -45,43 +44,14 @@ public class MainPlayWindowController : AWindowController
 
     protected override void OnPropertiesSet()
     {
-        
     }
 
     protected override void WhileHiding()
     {
     }
 
-    //////////////////////////////////////////
-    // Listeners
-    //////////////////////////////////////////
-
-    public void OnClickAdvCoupon()
-    {
-    }
-
-    public void OnClickCloseButton()
-    {
-    }
-
-    public void CloseThisWindow()
-    {
-    }
-
-    public void OnClickQuestion(int i)
-    {
-    }
-
-    public void OnClickPurchaseButton(int idx)
-    {
-    }
-
     private void DoInTransitionFinished(IUIScreenController screen)
     {
         
-    }
-
-    public void OnUpdateProductBoxes()
-    {
     }
 }
