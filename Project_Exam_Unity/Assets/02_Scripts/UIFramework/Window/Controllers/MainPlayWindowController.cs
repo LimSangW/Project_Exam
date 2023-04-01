@@ -20,19 +20,14 @@ public class MainPlayWindowController : AWindowController
         for (int i = 0; i < buttons.Count(); i++)
         {
             string strText = buttons[i].gameObject.name;
-
             strText = Regex.Replace(strText, @"\D", "");
-
             int nTmp = int.Parse(strText);
-
             buttons[i].onClick.AddListener(() => { OnClickButton(nTmp); });
-
         }
-        void OnClickButton(int tValue) {
-            //inGame manager. 만들어서 플레이어 넣기   플레이어 확장성을 감안해서. 구상하기.
-            //인게임매니저 불러와서 플레이어 매니저 불러와 함수 실행하기.
-            PlayerManager.Instance.CurrentDirView = tValue;
-            InGameManager.Instance.TargetAngryStart (tValue);
+        
+        void OnClickButton(int tValue) 
+        {
+            InGameManager.Instance.MainPlayer.CurrentDirView = tValue;
         }
     }
 
