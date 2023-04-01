@@ -27,7 +27,8 @@ public class MainPlayWindowController : AWindowController
         
         void OnClickButton(int tValue) 
         {
-            InGameManager.Instance.MainPlayer.CurrentDirView = tValue;
+            Debug.Log("ASD");
+            InGameManager.Instance.MainPlayer.PlayerAction(tValue);
         }
     }
 

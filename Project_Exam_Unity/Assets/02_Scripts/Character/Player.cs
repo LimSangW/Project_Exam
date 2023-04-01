@@ -1,50 +1,52 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     public enum UserState { Normal, Cheating, Over};
-    public UserState userState;
+    private UserState userState;
+    [SerializeField] private GameObject seekArea;
 
     private int currentDirView = 5;
-    public int CurrentDirView
+
+    public void PlayerAction(int dir)
     {
-        get
+        if (dir == 5)
         {
-            if (currentDirView == 5)
-            {
-                userState = UserState.Normal;
-                StopLook();
-            }
-            else
-            {
-                userState = UserState.Cheating;
-                LookAtFriend(currentDirView);
-            }
-            
-            return currentDirView;
+            userState = UserState.Normal;
+            StopLook();
         }
-        set
+        else
         {
-            currentDirView = value;
+            userState = UserState.Cheating;
+            LookAtFriend(dir);
         }
+        
+        currentDirView = dir;
     }
 
-    public void LookAtFriend(int tDir)
+    private void Start()
     {
-        if(CurrentDirView == tDir) return;
+        PlayerAction(currentDirView);
+    }
+
+    private void LookAtFriend(int tDir)
+    {
+        if(!seekArea.activeSelf) seekArea.SetActive(true);
+        if(currentDirView == tDir) return;
 
         Transform target = InGameManager.Instance.GetCurrentFriend(tDir).transform;
         Vector3 dir = target.position - transform.position;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle - 90, Vector3.forward);
-        
-        CurrentDirView = tDir;
     }
-    public void StopLook()
+
+    private void StopLook()
     {
-        CurrentDirView = 5;
+        if(seekArea.activeSelf) seekArea.SetActive(false);
     }
 }

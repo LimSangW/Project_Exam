@@ -81,7 +81,7 @@ public class InGameManager : ManagerWithMono<InGameManager>
             int thisFriendLocation = thisFriend.currentLocationPoint;
             
             friendsDic.Add(thisFriendLocation, friends[i]);
-            //thisFriend.friendTimer = new FriendTimer(Friend_ + thisFriendLocation, currentRoundData.time, GameOver_FriendTime, 0f);
+            thisFriend.friendTimer = new FriendTimer(Friend_ + thisFriendLocation, 180f, GameOver_FriendTime, 0f);
         }
     }
     
