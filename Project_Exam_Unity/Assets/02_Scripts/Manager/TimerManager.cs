@@ -11,6 +11,8 @@ public class Timer
     protected Action _callback;
     protected bool _isTimeOver = false;
 
+    public bool _isStart = false;
+
     public bool IsTimeOver => _isTimeOver;
 
     public double Time => _time;
@@ -24,6 +26,7 @@ public class Timer
         TimerManager.Instance.AddTimer(this);
     }
 
+    // 시간이 다시 차는 함수 만들기.
     public virtual void OnUpdate()
     {
         if (_isTimeOver == true)
@@ -73,6 +76,45 @@ public class Counter : Timer
     }
 }
 
+public class FriendTimer : Timer 
+{
+    public bool refreshFriend = false;
+    private double _maxTime;
+
+    public FriendTimer(string keyName, double time, Action timeoverCallback) : base(keyName, time, timeoverCallback)
+    {
+        _maxTime = _time;
+    }
+
+    public override void OnUpdate()
+    {
+        if (_isTimeOver == true)
+            return;
+
+        if(refreshFriend)
+        {
+            _time += UnityEngine.Time.unscaledDeltaTime;
+
+            if (_time >= _maxTime)
+            {
+                refreshFriend = false;
+                _isStart = false;
+            }
+        }
+        else
+        {
+            _time -= UnityEngine.Time.unscaledDeltaTime;
+            if (_time <= 0)
+            {
+                _isTimeOver = true;
+                TimerManager.Instance.RemoveTimer(this);
+
+                _callback?.Invoke();
+            }
+        }
+    }
+}
+
 
 public class TimerManager : SingletonWithMono<TimerManager>
 {
@@ -109,7 +151,8 @@ public class TimerManager : SingletonWithMono<TimerManager>
     {
         foreach(KeyValuePair<string, Timer> kv in _timers)
         {
-            kv.Value.OnUpdate();
+            if(kv.Value._isStart)
+                kv.Value.OnUpdate();
         }
     }
 

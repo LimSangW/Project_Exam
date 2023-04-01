@@ -10,6 +10,7 @@ public class PlayerManager : ManagerWithMono<PlayerManager>
     public enum UserState { Nnormal, Cheating, Over};
     public UserState userState;
 
+    public Player player;
 
     private int currentDirView = 5;
     public int CurrentDirView
@@ -39,6 +40,9 @@ public class PlayerManager : ManagerWithMono<PlayerManager>
     public override void Init()
     {
         base.Init();
+        player = new Player();
+        player = UnityEngine.Object.FindObjectOfType<Player>(); 
+
     }
 
     public void LookatFriend(int tDir)

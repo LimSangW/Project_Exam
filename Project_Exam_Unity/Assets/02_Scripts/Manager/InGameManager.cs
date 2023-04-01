@@ -15,6 +15,9 @@ public struct StrFriend
 }
 public class InGameManager : UpdateableManager<InGameManager>
 {
+    static public string Friend_ = "Friend_";
+
+
     public int ready; // 라운드 to 라운드 대기시간.
 
     public int round=0;
@@ -31,11 +34,13 @@ public class InGameManager : UpdateableManager<InGameManager>
     private StrFriend currentRoundData;
     private float decreaseSpeed;
 
-    private Friend currentFriend;        
-    private bool bIsStart = false;
+    private Friend currentFriend;
+
+    public Timer gameTimer;
 
     public override void Init()
     {
+        base.Init();    
         GameManager.Instance.RegisterUpdateableManager(this);
 
 
@@ -61,7 +66,8 @@ public class InGameManager : UpdateableManager<InGameManager>
         {
             return;
         }
-        //currentFriend;
+
+        // currentFriend;
         // 프렌드에 느낌표를 스프라이트 붙여서 다루나? 여기서?
         // 다루게 되면 느낌표가 점점 해제되어가는 건 ui적으로 표현하기 위해
         // 델리게이트로 함수 등록해 Friend의 느낌표 조절하는 함수를 점점 낮추자.
@@ -76,6 +82,19 @@ public class InGameManager : UpdateableManager<InGameManager>
 
 
     }
+    public void PreparationTime()
+    {
+        int temptime = 3;
+        if(gameTimer == null)
+        {
+            gameTimer = new Timer("InGameManagerTimer", temptime, StartRound);
+        }
+        else
+        {
+            gameTimer.RefreshTime(temptime);
+        }
+        gameTimer._isStart = true;
+    }
 
     public void FriendInit()
     {
@@ -84,11 +103,34 @@ public class InGameManager : UpdateableManager<InGameManager>
         friendsObjMap = new Dictionary<int, Friend>();
         Friend[] tFriendObjs = UnityEngine.Object.FindObjectsOfType<Friend>();
         int key = 0;
+        string temp;
         foreach (Friend tFriendObj in tFriendObjs)
         {
             key = tFriendObj.currentLocationPoint;
+            temp = Friend_ + key;
+            tFriendObj.friendTimer = new FriendTimer(temp, currentRoundData.time, GameOver_FriendTime);
+
             friendsObjMap.Add(key, tFriendObj);
+
+
         }
+    }
+    public void GameOver_FriendTime()
+    {
+        // 친구 보다가 타임 오버 됐다.
+        GameOver();
+    }
+    public void GameOver_TeacherMeet()
+    {
+        GameOver();
+    }
+    public void GameOver_TotalTime()
+    {
+        GameOver();
+    }
+    public void GameOver()
+    {
+
     }
     public void RoundInitData(int tRound)
     {
@@ -101,31 +143,64 @@ public class InGameManager : UpdateableManager<InGameManager>
     }
     public void FriendDataResettings()
     {
+        int tempj = 0;
         for (int i = 0; i < friendsObjMap.Count; i++)
         {
-            friendsObjMap.Values.ElementAt(i).DecreaseSpeed = Random.Range(currentRoundData.minDecreaseSpeed, currentRoundData.maxDecreaseSpeed);
+            tempj = i+1;
+            if(tempj == 5)
+            {
+                tempj = 9; 
+            }
+
+            friendsObjMap[tempj].DecreaseSpeed = Random.Range(currentRoundData.minDecreaseSpeed, currentRoundData.maxDecreaseSpeed);
+
+            friendsObjMap[tempj].friendTimer.RefreshTime(currentRoundData.time);
+            friendsObjMap[tempj].friendTimer._isStart = false;
+            friendsObjMap[tempj].friendTimer.refreshFriend = false;
+        }
+    }
+    public void StartRound()    // 위젯에서 3,2,1 카운트 끝나면 실행하게하자.
+    {
+        gameTimer._isStart = false;
+
+        int tempj = 0;
+        for (int i = 0; i < friendsObjMap.Count; i++)
+        {
+            tempj = i + 1;
+            if (tempj == 5)
+            {
+                tempj = 9;
+            }
+            friendsObjMap[tempj].friendTimer._isStart = true;
+            friendsObjMap[tempj].friendTimer.refreshFriend = true;
         }
     }
 
     public void NextRound()
     {
+        // 라운드가 클리어 됐을 때  이 함수를 연동해야한다.
         round++;
         RoundInitData(round);
         FriendDataResettings();
+
+        PreparationTime();
     }
 
     public void TargetAngryStart(int tTarget)
     {
-        if(tTarget == 5)
+        //타겟이 아닌 플레이어가 제자리에 가만히.
+        if (tTarget == 5)
         {
-            bIsStart = false;
             currentFriend = null;
             return;
         }
+        //직전에 보고 있던 friend
+        if(currentFriend != null)
+        {
+            currentFriend.friendTimer.refreshFriend = true;
+        }
 
-        bIsStart = true;
-
-        Friend targetObj = friendsObjMap.Values.ElementAt(tTarget);
+        Friend targetObj = friendsObjMap[tTarget];
         EFriendState targetState = targetObj.FriendState;
 
         //캐릭터가 보는 방향이 타겟의 포인트와 같냐?
@@ -140,21 +215,15 @@ public class InGameManager : UpdateableManager<InGameManager>
             case EFriendState.Over:
             if(targetObj.currentLocationPoint == PlayerManager.Instance.CurrentDirView)
             {
-                bIsStart = false;
+                GameOver_FriendTime();
+                return;
             }
             break;
             default:
             break;
         }
 
-        if(bIsStart)
-        {
-            // update 시작
-            currentFriend = targetObj;
-        }
-        else
-        {
-            //over
-        }
+        currentFriend = targetObj;
+        currentFriend.friendTimer.refreshFriend = false;
     }
 }

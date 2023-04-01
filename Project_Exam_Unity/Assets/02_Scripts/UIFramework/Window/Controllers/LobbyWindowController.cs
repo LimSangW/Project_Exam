@@ -19,6 +19,7 @@ public class LobbyWindowController : AWindowController
     public void OnClickStartButton()
     {
         Signals.Get<NavigateToWindowSignal>().Dispatch(ScreenIds.MainPlayWindow, null);
+        InGameManager.Instance.PreparationTime();
     }
 
     public void OnClickOverButton()
