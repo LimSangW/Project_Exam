@@ -83,10 +83,12 @@ public class FriendTimer : Timer
 {
     public bool refreshFriend = false;
     private double _maxTime;
+    private float recoveryTime = 0;
 
-    public FriendTimer(string keyName, double time, Action timeoverCallback) : base(keyName, time, timeoverCallback)
+    public FriendTimer(string keyName, double time, Action timeoverCallback, float recoveryTime) : base(keyName, time, timeoverCallback)
     {
         _maxTime = _time;
+        recoveryTime = recoveryTime;
     }
 
     public override void OnUpdate()
