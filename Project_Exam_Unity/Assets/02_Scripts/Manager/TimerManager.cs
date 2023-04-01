@@ -32,14 +32,17 @@ public class Timer
         if (_isTimeOver == true)
             return;
 
-        _time -= UnityEngine.Time.unscaledDeltaTime;
-        if (_time <= 0)
+        if(_isStart)
         {
-            _isTimeOver = true;
-            TimerManager.Instance.RemoveTimer(this);
+            _time -= UnityEngine.Time.unscaledDeltaTime;
+            if (_time <= 0)
+            {
+                _isTimeOver = true;
 
-            _callback?.Invoke();
+                _callback?.Invoke();
+            }
         }
+
     }
 
     public virtual void RefreshTime(double time)
@@ -91,25 +94,28 @@ public class FriendTimer : Timer
         if (_isTimeOver == true)
             return;
 
-        if(refreshFriend)
+        if(_isStart)
         {
-            _time += UnityEngine.Time.unscaledDeltaTime;
-
-            if (_time >= _maxTime)
+            if (refreshFriend)
             {
-                refreshFriend = false;
-                _isStart = false;
+                _time += UnityEngine.Time.unscaledDeltaTime;
+
+                if (_time >= _maxTime)
+                {
+                    refreshFriend = false;
+                    _isStart = false;
+                }
             }
-        }
-        else
-        {
-            _time -= UnityEngine.Time.unscaledDeltaTime;
-            if (_time <= 0)
+            else
             {
-                _isTimeOver = true;
-                TimerManager.Instance.RemoveTimer(this);
+                _time -= UnityEngine.Time.unscaledDeltaTime;
+                if (_time <= 0)
+                {
+                    _isTimeOver = true;
+                    //TimerManager.Instance.RemoveTimer(this);
 
-                _callback?.Invoke();
+                    _callback?.Invoke();
+                }
             }
         }
     }
@@ -151,8 +157,7 @@ public class TimerManager : SingletonWithMono<TimerManager>
     {
         foreach(KeyValuePair<string, Timer> kv in _timers)
         {
-            if(kv.Value._isStart)
-                kv.Value.OnUpdate();
+            kv.Value.OnUpdate();
         }
     }
 
