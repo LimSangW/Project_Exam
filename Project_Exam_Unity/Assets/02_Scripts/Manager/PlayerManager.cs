@@ -49,18 +49,18 @@ public class PlayerManager : ManagerWithMono<PlayerManager>
     {
         if(CurrentDirView == tDir)
         {
-            //해당하는 타겟 friend의 상태를 변경.  바로 접근해서 함수 실행
-            //GameManager.InGameManager.FriendManager.Friend[tDir].bIsState = false;
-           // FriendManager.Instance.
+            if (CurrentDirView == 5)
+                return;
+
+
+            // 토글 해제.  
         }
         CurrentDirView = tDir;
-        //friend manager.
-
-        //해당하는 타겟 friend의 상태를 변경.
-        //GameManager.InGameManager.FriendManager.Friend[tDir].bIsState = false;
     }
     public void StopLook()
     {
         CurrentDirView = 5;
     }
+
+
 }

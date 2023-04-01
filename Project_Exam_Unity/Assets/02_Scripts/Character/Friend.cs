@@ -24,6 +24,15 @@ public class Friend : MonoBehaviour
     public FriendTimer friendTimer;// = new Timer(Friend_1,60,);
 
 
+
+    private int currentHP;
+    public int CurrentHP
+    {
+        get { return currentHP; }
+        set { currentHP = value; }
+    }
+
+
     void Start()
     {
         

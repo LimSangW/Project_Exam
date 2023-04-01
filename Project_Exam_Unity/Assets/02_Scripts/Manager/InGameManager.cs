@@ -1,6 +1,7 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using static Friend;
 
@@ -9,7 +10,7 @@ public struct StrFriend
     public int time;
     public int randomRushNum;
     public int randomRushDecreaseHP;
-    //������Ʈ�� �����ɶ�? ���� ����������? ���� ����������? min�� max�� random�� �̾� �� friend ���� �� ����.
+    //占쏙옙占쏙옙占쏙옙트占쏙옙 占쏙옙占쏙옙占심띰옙? 占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙占쏙옙占쏙옙? 占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙占쏙옙占쏙옙? min占쏙옙 max占쏙옙 random占쏙옙 占싱억옙 占쏙옙 friend 占쏙옙占쏙옙 占쏙옙 占쏙옙占쏙옙.
     public float minDecreaseSpeed;
     public float maxDecreaseSpeed;
 }
@@ -17,7 +18,7 @@ public class InGameManager : Manager<InGameManager>
 {
     static public string Friend_ = "Friend_";
 
-    public int ready; // ���� to ���� ���ð�.
+    public int ready; // 占쏙옙占쏙옙 to 占쏙옙占쏙옙 占쏙옙占시곤옙.
 
     public int round=0;
     public int time;
@@ -85,7 +86,7 @@ public class InGameManager : Manager<InGameManager>
     }
     public void GameOver_FriendTime()
     {
-        // ģ�� ���ٰ� Ÿ�� ���� �ƴ�.
+        // 친占쏙옙 占쏙옙占쌕곤옙 타占쏙옙 占쏙옙占쏙옙 占싣댐옙.
         GameOver();
     }
     public void GameOver_TeacherMeet()
@@ -102,7 +103,7 @@ public class InGameManager : Manager<InGameManager>
     }
     public void RoundInitData(int tRound)
     {
-        // ���尡 ���� �� ������ xml �����Ϳ��� �������ֱ�.
+        // 占쏙옙占썲가 占쏙옙占쏙옙 占쏙옙 占쏙옙占쏙옙占쏙옙 xml 占쏙옙占쏙옙占싶울옙占쏙옙 占쏙옙占쏙옙占쏙옙占쌍깍옙.
         StrFriend tValue;
         if (friendXmlMap.TryGetValue(tRound, out tValue))
         {
@@ -127,7 +128,7 @@ public class InGameManager : Manager<InGameManager>
             friendsObjMap[tempj].friendTimer.refreshFriend = false;
         }
     }
-    public void StartRound()    // �������� 3,2,1 ī��Ʈ ������ �����ϰ�����.
+    public void StartRound()    // 占쏙옙占쏙옙占쏙옙占쏙옙 3,2,1 카占쏙옙트 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙占싹곤옙占쏙옙占쏙옙.
     {
         gameTimer._isStart = false;
 
@@ -146,7 +147,6 @@ public class InGameManager : Manager<InGameManager>
 
     public void NextRound()
     {
-        // ���尡 Ŭ���� ���� ��  �� �Լ��� �����ؾ��Ѵ�.
         round++;
         RoundInitData(round);
         FriendDataResettings();
@@ -156,13 +156,11 @@ public class InGameManager : Manager<InGameManager>
 
     public void TargetAngryStart(int tTarget)
     {
-        //Ÿ���� �ƴ� �÷��̾ ���ڸ��� ������.
         if (tTarget == 5)
         {
             currentFriend = null;
             return;
         }
-        //������ ���� �ִ� friend
         if(currentFriend != null)
         {
             currentFriend.friendTimer.refreshFriend = true;
@@ -171,9 +169,6 @@ public class InGameManager : Manager<InGameManager>
         Friend targetObj = friendsObjMap[tTarget];
         EFriendState targetState = targetObj.FriendState;
 
-        //ĳ���Ͱ� ���� ������ Ÿ���� ����Ʈ�� ����?
-
-        // Ÿ���� ���¸� Ȯ��,Ÿ���� decreasespeed�� Ȯ��
         switch (targetState) 
         {
             case EFriendState.Normal:
@@ -193,5 +188,33 @@ public class InGameManager : Manager<InGameManager>
 
         currentFriend = targetObj;
         currentFriend.friendTimer.refreshFriend = false;
+    }
+
+
+    public void FriendRecovery(string keyName, float tRecoveryTime)
+    {
+        keyName = Regex.Replace(keyName, @"\D", "");
+        int nTmp = int.Parse(keyName);
+
+        int tRecoveryHP = Mathf.RoundToInt((100 - friendsObjMap[nTmp].CurrentHP) / tRecoveryTime);
+
+        friendsObjMap[nTmp].CurrentHP += tRecoveryHP;
+        if (friendsObjMap[nTmp].CurrentHP >= 100)
+        {
+            friendsObjMap[nTmp].CurrentHP = 100;
+        }
+    }
+    public void FriendDamage(string keyName)
+    {
+        keyName = Regex.Replace(keyName, @"\D", "");
+        int nTmp = int.Parse(keyName);
+
+        friendsObjMap[nTmp].CurrentHP--;
+
+        if (friendsObjMap[nTmp].CurrentHP <= 0)
+        {
+            InGameManager.instance.GameOver_FriendTime();
+        }
+
     }
 }
