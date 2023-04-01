@@ -22,6 +22,7 @@ public class DataManager : Manager<DataManager>
     public override void Init()
     {
         base.Init();
+        LoadTable();
     }
 
     public override void ClearData()

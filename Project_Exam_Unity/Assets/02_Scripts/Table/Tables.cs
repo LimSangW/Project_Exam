@@ -168,16 +168,16 @@ public class Tables
         }
         catch (EndOfStreamException e)
         {
-            DebugEx.LogError("[Failed] Not enough data, Table: " + type.ToString());
-            DebugEx.Log(e.ToString());
-            DebugEx.Log(e.StackTrace);
+            Debug.LogError("[Failed] Not enough data, Table: " + type.ToString());
+            Debug.Log(e.ToString());
+            Debug.Log(e.StackTrace);
             reader.Close();
             return;
         }
         catch (Exception e)
         {
-            DebugEx.LogError(string.Format("[Failed] {0}Table, {1}", type.ToString(), e.ToString()));
-            DebugEx.Log(e.StackTrace);
+            Debug.LogError(string.Format("[Failed] {0}Table, {1}", type.ToString(), e.ToString()));
+            Debug.Log(e.StackTrace);
             reader.Close();
             return;
         }
