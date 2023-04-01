@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<TRTeacher>
+		<Index>1</Index>
+		<DevNote>Dummy</DevNote>
+		<PlayTime>0</PlayTime>
+		<Teacher>0</Teacher>
+	</TRTeacher>
+</Root>
