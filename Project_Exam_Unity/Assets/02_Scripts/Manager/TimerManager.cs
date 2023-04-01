@@ -26,7 +26,7 @@ public class Timer
         TimerManager.Instance.AddTimer(this);
     }
 
-    // ½Ã°£ÀÌ ´Ù½Ã Â÷´Â ÇÔ¼ö ¸¸µé±â.
+    // ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½.
     public virtual void OnUpdate()
     {
         if (_isTimeOver == true)
@@ -102,7 +102,7 @@ public class FriendTimer : Timer
             {
                 _time += UnityEngine.Time.unscaledDeltaTime;
 
-                InGameManager.Instance.FriendRecovery(KeyName, recoveryTime);
+                //InGameManager.Instance.FriendRecovery(KeyName, recoveryTime);
                 if (_time >= _maxTime)
                 {
                     refreshFriend = false;
