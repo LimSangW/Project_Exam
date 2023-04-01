@@ -1,6 +1,8 @@
 public enum TableType
 {
     Test,
+    Friend,
+    Teacher,
     Length
 }
 
