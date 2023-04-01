@@ -85,10 +85,10 @@ public class FriendTimer : Timer
     private double _maxTime;
     private float recoveryTime = 0;
 
-    public FriendTimer(string keyName, double time, Action timeoverCallback, float recoveryTime) : base(keyName, time, timeoverCallback)
+    public FriendTimer(string keyName, double time, Action timeoverCallback, float _recoveryTime) : base(keyName, time, timeoverCallback)
     {
         _maxTime = _time;
-        recoveryTime = recoveryTime;
+        recoveryTime = _recoveryTime;
     }
 
     public override void OnUpdate()
@@ -102,6 +102,7 @@ public class FriendTimer : Timer
             {
                 _time += UnityEngine.Time.unscaledDeltaTime;
 
+                InGameManager.Instance.FriendRecovery(KeyName, recoveryTime);
                 if (_time >= _maxTime)
                 {
                     refreshFriend = false;
