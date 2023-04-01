@@ -1,3 +1,5 @@
+using Project.UIFramework;
+using Project.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using System.Transactions;
@@ -16,5 +18,7 @@ public class GameStartState_InitManager : GameStartState
         DataManager.Instance.Init();
 
         stateManager.OnNextAction();
+
+        Signals.Get<NavigateToWindowSignal>().Dispatch(ScreenIds.MainPlayWindow, null);
     }
 }
