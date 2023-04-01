@@ -4,18 +4,8 @@ public enum TableType
     Length
 }
 
-public enum DirectionType
+public enum TransitionType
 {
-	LEFT,
-    RIGHT,
-    UP,
-    DOWN
-}
-
-public enum ObjectType
-{
-    Character,
-    Obstacle,
-	Platform,
-	Consumable
+    A,
+    B,
 }

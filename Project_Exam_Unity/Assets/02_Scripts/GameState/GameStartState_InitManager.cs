@@ -14,7 +14,6 @@ public class GameStartState_InitManager : GameStartState
     {
         UIManager.Instance.Init();
         DataManager.Instance.Init();
-        StageManager.Instance.Init();
 
         stateManager.OnNextAction();
     }
