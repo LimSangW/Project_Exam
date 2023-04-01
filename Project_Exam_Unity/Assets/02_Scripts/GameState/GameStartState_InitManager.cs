@@ -19,6 +19,6 @@ public class GameStartState_InitManager : GameStartState
 
         stateManager.OnNextAction();
 
-        Signals.Get<NavigateToWindowSignal>().Dispatch(ScreenIds.MainPlayWindow, null);
+        Signals.Get<NavigateToWindowSignal>().Dispatch(ScreenIds.LobbyWindow, null);
     }
 }
