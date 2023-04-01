@@ -2,6 +2,151 @@ using UnityEngine;
 using UnityEditor;
 using System;
 
+public static class Utilities
+{
+    public static bool IsConnectedInternet
+    {
+        get
+        {
+            return Application.internetReachability != NetworkReachability.NotReachable;
+        }
+    }
+    
+    public static Texture2D GetScreenShot(Camera cam, int targetLayers, int width, int height, Texture2D waterMark = null)
+    {
+        Texture2D _tex;
+        //capture.
+        cam.cullingMask = targetLayers;
+
+        RenderTexture rt = new RenderTexture(width, height, 24);
+        cam.targetTexture = rt;
+        _tex = new Texture2D(width, height, TextureFormat.RGB24, false);
+        cam.Render();
+        RenderTexture.active = rt;
+        _tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+
+        //destroy.
+        cam.targetTexture = null;
+        RenderTexture.active = null;
+        UnityEngine.Object.Destroy(rt);
+
+        Texture2D myTexture = ScaleTexture(_tex, width, height);
+
+        AddWatermark(myTexture, waterMark);
+
+        return myTexture;
+    }
+
+    static Texture2D ScaleTexture(Texture2D source, int targetWidth, int targetHeight)
+    {
+        Texture2D result = new Texture2D(targetWidth, targetHeight, source.format, true);
+        Color[] rpixels = result.GetPixels(0);
+        float incX = (1.0f / targetWidth);
+        float incY = (1.0f / targetHeight);
+        for (int px = 0; px < rpixels.Length; px++)
+        {
+            rpixels[px] = source.GetPixelBilinear(incX * ((float)px % targetWidth), incY * Mathf.Floor(px / targetWidth));
+        }
+        result.SetPixels(rpixels, 0);
+        result.Apply();
+        return result;
+    }
+
+    static Texture2D AddWatermark(Texture2D target, Texture2D waterMark)
+    {
+        if (waterMark != null)
+        {
+            int startX = target.width - waterMark.width;
+
+            for (int x = startX; x < target.width; x++)
+            {
+
+                for (int y = 0; y < target.height; y++)
+                {
+                    Color bgColor = target.GetPixel(x, y);
+                    Color wmColor = waterMark.GetPixel(x - startX, y);
+
+                    Color final_color = Color.Lerp(bgColor, wmColor, wmColor.a / 1.0f);
+
+                    target.SetPixel(x, y, final_color);
+                }
+            }
+
+            target.Apply();
+        }
+
+        return target;
+    }
+
+    public static string SimplifyValue(Int64 value)
+    {
+        string returnValue = string.Empty;
+
+        if (value > 100000000)
+        {
+            returnValue = (value / 1000000).ToString("F1") + "M";
+        }
+        else if (value > 10000)
+        {
+            returnValue = (value / 1000).ToString("F1") + "K";
+        }
+        else
+        {
+            returnValue = value.ToString();
+        }
+        return returnValue;
+    }
+
+    public static GameObject CreateOrGetGameObject(string name, GameObject parent = null)
+    {
+        GameObject obj = GameObject.Find(name);
+        if (obj == null)
+            obj = CreateGameObject(name, parent);
+        return obj;
+    }
+
+    public static GameObject CreateGameObject(string name, GameObject parent = null)
+    {
+        GameObject obj = new GameObject(name);
+
+        if (parent != null)
+            obj.transform.SetParent(parent.transform);
+
+        obj.transform.localPosition = Vector3.zero;
+        obj.transform.localRotation = Quaternion.Euler(Vector3.zero);
+        obj.transform.localScale = Vector3.one;
+
+        return obj;
+    }
+
+    public static GameObject Instantiate(GameObject baseObj)
+    {
+        GameObject obj = GameObject.Instantiate(baseObj);
+        obj.name = baseObj.name;
+
+        obj.transform.localPosition = Vector3.zero;
+        obj.transform.localRotation = Quaternion.Euler(Vector3.zero);
+        obj.transform.localScale = Vector3.one;
+        return obj;
+    }
+
+    public static void SetChild(Transform trans, Transform parent)
+    {
+        trans.SetParent(parent);
+        trans.localPosition = Vector3.zero;
+        trans.localRotation = Quaternion.Euler(Vector3.zero);
+        trans.localScale = Vector3.one;
+    }
+    
+
+    public static Color GetColorByHex(string hexCode)
+    {
+        Color color;
+        ColorUtility.TryParseHtmlString(hexCode, out color);
+        return color;
+    }
+}
+
 public static class Func
 {
 	public static int FastIndexOf(string source, string pattern)
