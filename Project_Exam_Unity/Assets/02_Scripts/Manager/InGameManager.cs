@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Project.Utils;
+using Project.UIFramework;
 using UnityEngine;
 
 public class FriendRoundInfo
@@ -25,7 +27,7 @@ public class InGameManager : ManagerWithMono<InGameManager>
 
     public int round = 0;
     public int time;
-    public int score;
+    private int score;
 
     public int maxRound;
     public int maxScore;
@@ -39,6 +41,8 @@ public class InGameManager : ManagerWithMono<InGameManager>
     [SerializeField] private Transform friendGroup;
     public Player MainPlayer;
     public Timer GameTimer;
+
+    public int Score => score;
 
 
     public override void Init()
@@ -100,7 +104,7 @@ public class InGameManager : ManagerWithMono<InGameManager>
     }
     public void GameOver()
     {
-
+        Signals.Get<NavigateToWindowSignal>().Dispatch(ScreenIds.GameOverWindow, null);
     }
     
     private void InitData()

@@ -13,6 +13,8 @@ namespace Project.UIFramework {
     
     public sealed class ScreenIds {
         
+        public const string GameOverWindow = "GameOverWindow";
+        
         public const string LobbyWindow = "LobbyWindow";
         
         public const string MainPlayWindow = "MainPlayWindow";
