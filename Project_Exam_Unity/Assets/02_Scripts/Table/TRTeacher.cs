@@ -3,9 +3,10 @@ using System.Xml;
 
 public class TRTeacher : TRFoundation
 {
-    private string name;
-
-    public string Name => name;
+    private float playTime;
+    private float teacherNum;
+    public float PlayTime => playTime;
+    public float TeacherNum => teacherNum;
 
     public override bool ReadRawData(XmlReader reader)
     {
@@ -15,7 +16,8 @@ public class TRTeacher : TRFoundation
         base.ReadRawData(reader);
 
         //형식 변화
-        result &= XmlHelper.ReadString(reader, "Name", ref name);
+        result &= XmlHelper.ReadFloat(reader, "PlayTime", ref playTime);
+        result &= XmlHelper.ReadFloat(reader, "TeacherNum", ref teacherNum);
 
         //형식 유지
         reader.ReadEndElement();
@@ -28,7 +30,8 @@ public class TRTeacher : TRFoundation
         base.Read(reader);
 
         //형식 변화
-        name = reader.ReadString();
+        playTime = reader.ReadFloat();
+        teacherNum = reader.ReadFloat();
 
         //형식 유지
         return true;
@@ -40,6 +43,7 @@ public class TRTeacher : TRFoundation
         base.Write(writer);
 
         //형식 변화
-        writer.Write(name);
+        writer.Write(playTime);
+        writer.Write(teacherNum);
     }
 }

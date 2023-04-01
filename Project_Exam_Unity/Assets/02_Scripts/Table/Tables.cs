@@ -325,6 +325,12 @@ public class Tables
             case TableType.Test:
                 result = new TRTest();
                 break;
+            case TableType.Teacher:
+                result = new TRTeacher();
+                break;
+            case TableType.Friend:
+                result = new TRFriend();
+                break;
         }
 
         return result;

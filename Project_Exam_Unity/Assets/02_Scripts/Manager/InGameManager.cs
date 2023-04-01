@@ -9,16 +9,15 @@ public struct StrFriend
     public int time;
     public int randomRushNum;
     public int randomRushDecreaseHP;
-    //ÄÄÆ÷³ÍÆ®¿¡ ºÎÂøµÉ¶§? °ÔÀÓ ½ÃÀÛÇßÀ»¶§? ¶ó¿îµå ½ÃÀÛÇßÀ»¶§? min°ú max·Î random°ª »Ì¾Æ °¢ friend ¸¶´Ù °ª ¼³Á¤.
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½É¶ï¿½? ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½? ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½? minï¿½ï¿½ maxï¿½ï¿½ randomï¿½ï¿½ ï¿½Ì¾ï¿½ ï¿½ï¿½ friend ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
     public float minDecreaseSpeed;
     public float maxDecreaseSpeed;
 }
-public class InGameManager : UpdateableManager<InGameManager>
+public class InGameManager : Manager<InGameManager>
 {
     static public string Friend_ = "Friend_";
 
-
-    public int ready; // ¶ó¿îµå to ¶ó¿îµå ´ë±â½Ã°£.
+    public int ready; // ï¿½ï¿½ï¿½ï¿½ to ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ã°ï¿½.
 
     public int round=0;
     public int time;
@@ -26,8 +25,6 @@ public class InGameManager : UpdateableManager<InGameManager>
 
     public int maxRound;
     public int maxScore;
-
-
 
     private Dictionary<int, StrFriend> friendXmlMap;
     private Dictionary<int, Friend> friendsObjMap;
@@ -41,7 +38,7 @@ public class InGameManager : UpdateableManager<InGameManager>
     public override void Init()
     {
         base.Init();    
-        GameManager.Instance.RegisterUpdateableManager(this);
+        GameManager.Instance.RegisterManager(this);
 
 
         friendXmlMap = new Dictionary<int, StrFriend>();
@@ -53,35 +50,10 @@ public class InGameManager : UpdateableManager<InGameManager>
         FriendDataResettings();
     }
 
-    public override void OnUpdate()
-    {
-        //½Ã°£À» ´Ù·é´Ù. °ÔÀÓÁøÇà ½Ã°£, ÁØºñ½Ã°£.
-
-
-
-        //  - - - - - -
-        // friend ´Ù·ë
-        
-        if (currentFriend == null)
-        {
-            return;
-        }
-
-        // currentFriend;
-        // ÇÁ·»µå¿¡ ´À³¦Ç¥¸¦ ½ºÇÁ¶óÀÌÆ® ºÙ¿©¼­ ´Ù·ç³ª? ¿©±â¼­?
-        // ´Ù·ç°Ô µÇ¸é ´À³¦Ç¥°¡ Á¡Á¡ ÇØÁ¦µÇ¾î°¡´Â °Ç uiÀûÀ¸·Î Ç¥ÇöÇÏ±â À§ÇØ
-        // µ¨¸®°ÔÀÌÆ®·Î ÇÔ¼ö µî·ÏÇØ FriendÀÇ ´À³¦Ç¥ Á¶ÀýÇÏ´Â ÇÔ¼ö¸¦ Á¡Á¡ ³·ÃßÀÚ.
-
-
-
-
-    }
-
     public override void ClearData()
     {
-
-
     }
+    
     public void PreparationTime()
     {
         int temptime = 3;
@@ -98,8 +70,6 @@ public class InGameManager : UpdateableManager<InGameManager>
 
     public void FriendInit()
     {
-        // ¸Ê¿¡ ¹èÄ¡µÈ Ä£±¸µé µ¥·Á¿À±â
-
         friendsObjMap = new Dictionary<int, Friend>();
         Friend[] tFriendObjs = UnityEngine.Object.FindObjectsOfType<Friend>();
         int key = 0;
@@ -108,16 +78,14 @@ public class InGameManager : UpdateableManager<InGameManager>
         {
             key = tFriendObj.currentLocationPoint;
             temp = Friend_ + key;
-            tFriendObj.friendTimer = new FriendTimer(temp, currentRoundData.time, GameOver_FriendTime);
+            tFriendObj.friendTimer = new FriendTimer(temp, currentRoundData.time, GameOver_FriendTime, 0f);
 
             friendsObjMap.Add(key, tFriendObj);
-
-
         }
     }
     public void GameOver_FriendTime()
     {
-        // Ä£±¸ º¸´Ù°¡ Å¸ÀÓ ¿À¹ö µÆ´Ù.
+        // Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½Ù°ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´ï¿½.
         GameOver();
     }
     public void GameOver_TeacherMeet()
@@ -134,7 +102,7 @@ public class InGameManager : UpdateableManager<InGameManager>
     }
     public void RoundInitData(int tRound)
     {
-        // ¶ó¿îµå°¡ °»½Å µÉ ¶§¸¶´Ù xml µ¥ÀÌÅÍ¿¡¼­ ¼¼ÆÃÇØÁÖ±â.
+        // ï¿½ï¿½ï¿½å°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ xml ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½.
         StrFriend tValue;
         if (friendXmlMap.TryGetValue(tRound, out tValue))
         {
@@ -159,7 +127,7 @@ public class InGameManager : UpdateableManager<InGameManager>
             friendsObjMap[tempj].friendTimer.refreshFriend = false;
         }
     }
-    public void StartRound()    // À§Á¬¿¡¼­ 3,2,1 Ä«¿îÆ® ³¡³ª¸é ½ÇÇàÇÏ°ÔÇÏÀÚ.
+    public void StartRound()    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 3,2,1 Ä«ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ï¿½ï¿½ï¿½ï¿½.
     {
         gameTimer._isStart = false;
 
@@ -178,7 +146,7 @@ public class InGameManager : UpdateableManager<InGameManager>
 
     public void NextRound()
     {
-        // ¶ó¿îµå°¡ Å¬¸®¾î µÆÀ» ¶§  ÀÌ ÇÔ¼ö¸¦ ¿¬µ¿ÇØ¾ßÇÑ´Ù.
+        // ï¿½ï¿½ï¿½å°¡ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½  ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½Ñ´ï¿½.
         round++;
         RoundInitData(round);
         FriendDataResettings();
@@ -188,13 +156,13 @@ public class InGameManager : UpdateableManager<InGameManager>
 
     public void TargetAngryStart(int tTarget)
     {
-        //Å¸°ÙÀÌ ¾Æ´Ñ ÇÃ·¹ÀÌ¾î°¡ Á¦ÀÚ¸®¿¡ °¡¸¸È÷.
+        //Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
         if (tTarget == 5)
         {
             currentFriend = null;
             return;
         }
-        //Á÷Àü¿¡ º¸°í ÀÖ´ø friend
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ friend
         if(currentFriend != null)
         {
             currentFriend.friendTimer.refreshFriend = true;
@@ -203,9 +171,9 @@ public class InGameManager : UpdateableManager<InGameManager>
         Friend targetObj = friendsObjMap[tTarget];
         EFriendState targetState = targetObj.FriendState;
 
-        //Ä³¸¯ÅÍ°¡ º¸´Â ¹æÇâÀÌ Å¸°ÙÀÇ Æ÷ÀÎÆ®¿Í °°³Ä?
+        //Ä³ï¿½ï¿½ï¿½Í°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½?
 
-        // Å¸°ÙÀÇ »óÅÂ¸¦ È®ÀÎ,Å¸°ÙÀÇ decreasespeed¸¦ È®ÀÎ
+        // Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ È®ï¿½ï¿½,Å¸ï¿½ï¿½ï¿½ï¿½ decreasespeedï¿½ï¿½ È®ï¿½ï¿½
         switch (targetState) 
         {
             case EFriendState.Normal:
